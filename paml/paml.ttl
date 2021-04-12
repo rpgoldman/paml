@@ -38,114 +38,281 @@ xsd:anySimpleType rdf:type rdfs:Datatype .
 #    Classes
 #################################################################
 
-# Activities (nodes)
-paml:Activity rdf:type owl:Class ;
-            rdfs:subClassOf sbol:Identified ;
-              rdfs:comment "Activities are the nodes in an activity graph" .
+## Behavior
 
-paml:Control rdf:type owl:Class ;
-        rdfs:subClassOf paml:Activity ;
-              rdfs:comment "Abstract class; Control activities regulate progress through the activity graph" .
-#       [ rdf:type owl:Restriction ;
-#                owl:onProperty paml:controlType ;
-#                owl:allValuesFrom xsd:anyURI
-#                owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-#                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-#              ] ;
-        
-# change control subclasses can be changed into an enum on Control?
+# TODO: behavior is a classifier, which introduces a namespace
+paml:Behavior rdf:type owl:Class ;
+    rdfs:comment "Abstract behavior class" ;
+    rdfs:subClassOf sbol:Identified ,
+                    [
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:inputs ;
+                      owl:onClass paml:Parameter ;
+                    ] ,
+                    [
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:outputs ;
+                      owl:onClass paml:Parameter ;
+                    ] ,
+                    [
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:preconditions ;
+                      owl:onClass paml:Constraint
+                    ] ,
+                    [
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:postconditions ;
+                      owl:onClass paml:Constraint                
+                    ] 
+    .
+
+# TODO: section 7.6; constraint is given by value specification of type boolean over a set of constrained elements
+paml:Constraint rdf:type owl:Class ;
+    rdfs:comment "Pre- and post-conditions" 
+    .
+
+paml:Parameter rdf:type owl:Class ;
+    rdfs:comment "Parameter for acivity" 
+    .
+
+paml:Activity rdf:type owl:Class ;
+    rdfs:comment "" ;
+    rdfs:subClassOf sbol:TopLevel ,
+                    [
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:nodes ;
+                      owl:onClass paml:ActivityNode
+                    ] ,
+                    [
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:edges ;
+                      owl:onClass paml:ActivityEdge               
+                    ]
+    .
+
+## Graph
+
+# TODO: node should have an incoming edge and outgoing edge
+# TODO: node is a named element (actually, redefinable element)
+paml:ActivityNode rdf:type owl:Class ;
+    rdfs:subClassOf sbol:Identified ;
+    rdfs:comment "Activities are the nodes in an activity graph"
+    .
+
+paml:ControlNode rdf:type owl:Class ;
+    rdfs:subClassOf paml:ActivityNode ;
+    rdfs:comment "Abstract class; Control activities regulate progress through the activity graph" 
+    .
+
+# TODO: inherits from typed element - should have type
+paml:ObjectNode rdf:type owl:Class ;
+    rdfs:comment "Abstract class";
+    rdfs:subClassOf paml:ActivityNode
+    .
+
+# TODO: needs to be bound to a parameter of the activity
+paml:ActivityParameterNode rdf:type owl:Class ;
+    rdfs:comment "object node for parameter" ;
+    rdfs:subClassOf paml:ObjectNode ,
+                    [
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:parameter ;
+                      owl:onClass paml:Parameter
+                    ]
+    .
+
+# TODO: is a redefinable element, which means is a named element
+paml:ActivityEdge rdf:type owl:Class ;
+    rdfs:comment "Flows are the edges of an activity graph" ;
+    rdfs:comment "A flow connects precisely one activity source to precisely one activity sink" ;
+    rdfs:subClassOf sbol:Identified ,
+                    [ 
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:source ;
+                      owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+                      owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                      owl:onClass paml:ActivityNode
+                    ] ,
+                    [ 
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:target ;
+                      owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+                      owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                      owl:onClass paml:ActivityNode
+                    ] ,
+                    [
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:guard ;
+                      owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+                      owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                      owl:onClass paml:ValueSpecification
+                    ] ,
+                    [
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:weight ;
+                      owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+                      owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                      owl:onClass paml:ValueSpecification
+                    ]
+    .
+
+paml:source rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf opil:compositionalProperty ;
+    rdfs:domain paml:ActivityEdge ;
+    rdfs:range paml:ActivityNode ;
+    rdfs:label "source" ;
+    rdfs:comment "Activity from which a flow originates" 
+    .
+
+paml:target rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf opil:compositionalProperty ;
+    rdfs:domain paml:ActivityEdge ;
+    rdfs:range paml:ActivityNode ;
+    rdfs:label "target" ;
+    rdfs:comment "Activity at which a flow arrives" 
+    .
+
+paml:ValueSpecification rdf:type owl:Class ;
+    rdfs:comment ""
+    .
+
+paml:guard rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf opil:compositionalProperty ;
+    rdfs:domain paml:ActivityEdge ;
+    rdfs:range paml:ValueSpecification ;
+    rdfs:label "guard" ;
+    rdfs:comment ""
+    .
+
+paml:weight rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf opil:compositionalProperty ;
+    rdfs:domain paml:ActivityEdge ;
+    rdfs:range paml:ValueSpecification ;
+    rdfs:label "weight" ;
+    rdfs:comment ""
+    .
+
+paml:ControlFlow rdf:type owl:Class ;
+    rdfs:subClassOf paml:ActivityEdge ;
+    rdfs:comment "Control flows indicate that the source activity must occur before the sink activity" .
+
+paml:ObjectFlow rdf:type owl:Class ;
+    rdfs:comment "edge representing object flow" ;
+    rdfs:subClassOf paml:ActivityEdge ,
+                    [
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:transformation ;
+                      owl:onClass paml:Behavior
+                      # 0..1
+                    ] ,
+                    [
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:selection ;
+                      owl:onClass paml:Behavior
+                      # 0..1
+                    ]
+    .
+
+## Control
+       
 paml:Fork rdf:type owl:Class ;
-        rdfs:subClassOf paml:Control ;
-              rdfs:comment "Fork executes multiples paths in parallel" .
+    rdfs:subClassOf paml:ControlNode ;
+    rdfs:comment "Fork executes multiples paths in parallel" 
+    .
 
 paml:Join rdf:type owl:Class ;
-        rdfs:subClassOf paml:Control ;
-              rdfs:comment "Join is the complement of Fork; it continues when ALL incoming flows are ready" .
+    rdfs:subClassOf paml:ControlNode ;
+    rdfs:comment "Join is the complement of Fork; it continues when ALL incoming flows are ready" 
+    .
 
 paml:Initial rdf:type owl:Class ;
-        rdfs:subClassOf paml:Fork ;
-              rdfs:comment "Initial is a fork node that also initiates control flow through the network" .
+    rdfs:subClassOf paml:ControlNode ;
+    rdfs:comment "Initial generates control tokens" 
+    .
 
 paml:Final rdf:type owl:Class ;
-        rdfs:subClassOf paml:Join ;
-              rdfs:comment "Final is a join node that also terminates control flow through the network" .
+    rdfs:subClassOf paml:ControlNode ;
+    rdfs:comment "Final accepts tokens" 
+    .
+
+paml:FlowFinal rdf:type owl:Class ;
+    rdfs:subClassOf paml:Final ;
+    rdfs:comment "FlowFinal accetps object flow tokens" 
+    .
+
+paml:ActivityFinal rdf:type owl:Class ;
+    rdfs:subClassOf paml:Final ;
+    rdfs:comment "ActivityFinal accepts control tokens" 
+    .
 
 paml:Decision rdf:type owl:Class ;
-        rdfs:subClassOf paml:Control ;
-              rdfs:comment "Decision is a branch that sends control flow to precisely one of the options." .
+    rdfs:subClassOf paml:ControlNode ;
+    rdfs:comment "Decision is a branch that sends control flow to precisely one of the options." .
 
 paml:Merge rdf:type owl:Class ;
-        rdfs:subClassOf paml:Control ;
-              rdfs:comment "Merge is the complement of Decision; it continues when ANY incoming flow is ready." .
+    rdfs:subClassOf paml:ControlNode ;
+    rdfs:comment "Merge is the complement of Decision; it continues when ANY incoming flow is ready." .
 
+## Actions
 
+# TODO: Need to add exception handler, section 15.5.2
+paml:ExecutableNode rdf:type owl:Class ;
+    rdfs:comment "Abstract class; executable activities manipulate flows of information or physical objects" ;
+    rdfs:subClassOf paml:ActivityNode 
+    .
 
+# TODO: add pre- and post-conditions as Constraints
+paml:Action rdf:type owl:Class ;
+    rdfs:comment "invocation of primitive action or activity" ;
+    rdfs:subClassOf paml:ExecutableNode ,
+                     [ 
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:input ;
+                      owl:onClass paml:Pin
+                    ] ,
+                    [ 
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:output ;
+                      owl:onClass paml:Pin
+                    ] 
+    .
 
-paml:Executable rdf:type owl:Class ;
-                rdfs:comment "Abstract class; executable activities manipulate flows of information or physical objects" ;
-              rdfs:subClassOf paml:Activity ,
-                              [ rdf:type owl:Restriction ;
-                                  owl:onProperty paml:input ;
-                                  owl:onClass paml:Pin
-                                ] ,
-                              [ rdf:type owl:Restriction ;
-                                  owl:onProperty paml:output ;
-                                 owl:onClass paml:Pin
-                                ] .     
- 
+# TODO: spec includes multiplicity
 paml:Pin rdf:type owl:Class ;
-       rdfs:subClassOf paml:Activity ;
-         rdfs:comment "A Pin is a typed input or output of an Executable. Pins are Activities so that control can be applied to flows between them" ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:instanceOfPin ;
-                owl:onClass paml:PinSpecification ;
-                owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-              ] .
+    rdfs:comment "A Pin is a typed input or output of an Action." ;
+    rdfs:subClassOf paml:ObjectNode
+    .
 
-paml:instanceOfPin rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf opil:compositionalProperty ;
-              rdfs:domain paml:Pin ;
-              rdfs:range paml:PinSpecification ;
-              rdfs:label "instanceOfPin" ;
-              rdfs:comment "Primitive pin to be instantiated" .
+# TODO: make sure all cases in spec are covered
+paml:InputPin rdf:type owl:Class ;
+    rdfs:comment "an input pin" ;
+    rdfs:subClassOf paml:Pin
+    .
 
+# TODO: make sure all cases in spec are covered
+paml:OutputPin rdf:type owl:Class ;
+    rdfs:comment "an output" ;
+    rdfs:subClassOf paml:Pin
+    .
 
-# should the Value vs. Physical distinction be turned into a type rather than a class distinction?
 paml:ValuePin rdf:type owl:Class ;
-              rdfs:comment "A ValuePin represents information as an input or output" ;
-            rdfs:subClassOf paml:Pin ,
-                            [ rdf:type owl:Restriction ;
-                                owl:onProperty paml:type ;
-                                owl:allValuesFrom xsd:anyURI ;
-                                owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-                              ] .
-
-paml:LocalValuePin rdf:type owl:Class ;
-              rdfs:comment "A LocalValuePin is an input pin with a constant value" ;
-            rdfs:subClassOf paml:ValuePin ,
-                            [ rdf:type owl:Restriction ;
-                                owl:onProperty paml:value ;
-                                owl:onClass sbol:Identified ;
-                                owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-                              ] .
+    rdfs:comment "A ValuePin represents information as an input or output" ;
+    rdfs:subClassOf paml:InputPin ,
+                    [ 
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:value ;
+                      owl:onClass sbol:Identified ;
+                      owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+                      owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    ] 
+    .
 
 paml:value rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf opil:compositionalProperty ;
-              rdfs:domain paml:LocalValuePin ;
-              rdfs:range sbol:Identified ;
-              rdfs:label "value" ;
-              rdfs:comment "Constant value to be supplied to the pin" .
-
-paml:PhysicalPin rdf:type owl:Class ;
-                 rdfs:comment "A PhysicalPin represents a physical input or output" ;
-        rdfs:subClassOf paml:Pin ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:type ;
-                owl:onClass sbol:Component
-              ] .
+    rdfs:subPropertyOf opil:compositionalProperty ;
+    rdfs:domain paml:ValuePin ;
+    rdfs:range paml:ValueSpecification ;
+    rdfs:label "value" ;
+    rdfs:comment "Constant value to be supplied to the pin" .
 
 paml:PrimitiveExecutable rdf:type owl:Class ;
               rdfs:comment "An executable that is a base-level library function, with its Pins determined by the specification of the function" ;
@@ -165,34 +332,36 @@ paml:instanceOf rdf:type owl:ObjectProperty ;
               rdfs:comment "Primitive to be executed" .
 
 paml:SubProtocol rdf:type owl:Class ;
-              rdfs:comment "An executable that is implemented as a Protocol, with its Pins determined by the input and output properties" ;
-        rdfs:subClassOf paml:Executable ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:implementedBy ;
-                owl:onClass paml:Protocol ;
-                owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-              ] .
+    rdfs:comment "An executable that is implemented as a Protocol, with its Pins determined by the input and output properties" ;
+    rdfs:subClassOf paml:Executable ,
+                    [ 
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:implementedBy ;
+                      owl:onClass paml:Protocol ;
+                      owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+                      owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+                    ]
+    .
 
 paml:implementedBy rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf opil:compositionalProperty ;
-              rdfs:domain paml:SubProtocol ;
-              rdfs:range paml:Protocol ;
-              rdfs:label "implementedBy" ;
-              rdfs:comment "Protocol to be executed as a sub-protocol" .
+    rdfs:subPropertyOf opil:compositionalProperty ;
+    rdfs:domain paml:SubProtocol ;
+    rdfs:range paml:Protocol ;
+    rdfs:label "implementedBy" ;
+    rdfs:comment "Protocol to be executed as a sub-protocol" .
 
 paml:InformationExecutable rdf:type owl:Class ;
-        rdfs:subClassOf paml:Executable ;
+    rdfs:subClassOf paml:Executable ;
               rdfs:comment "Abstract class; Executable activities that interact only with information flows (i.e., has no PhysicalPin)" .
 
 paml:PhysicalExecutable rdf:type owl:Class ;
-        rdfs:subClassOf paml:Executable ;
-              rdfs:comment "Abstract class; Executable activities that can interact with physical flows (i.e., has at least one PhysicalPin)" .
+    rdfs:subClassOf paml:Executable ;
+    rdfs:comment "Abstract class; Executable activities that can interact with physical flows (i.e., has at least one PhysicalPin)" .
 
 
 paml:Value rdf:type owl:Class ;
               rdfs:comment "Value activities are unilateral sources and sinks of information in the graph" ;
-        rdfs:subClassOf paml:Activity ,
+        rdfs:subClassOf paml:ActivityNode ,
         [ rdf:type owl:Restriction ;
                 owl:onProperty paml:type ;
                 owl:minCardinality "1"^^xsd:nonNegativeInteger ;
@@ -201,7 +370,7 @@ paml:Value rdf:type owl:Class ;
 
 paml:Physical rdf:type owl:Class ;
               rdfs:comment "Physical activities are unilateral sources and sinks of physical materials in the graph" ;
-        rdfs:subClassOf paml:Activity ,
+        rdfs:subClassOf paml:ActivityNode ,
         [ rdf:type owl:Restriction ;
                 owl:onProperty paml:type ;
                 owl:onClass sbol:Component ;
@@ -210,56 +379,13 @@ paml:Physical rdf:type owl:Class ;
               ] .
 
 paml:type rdf:type owl:ObjectProperty ;
-              rdfs:domain paml:Activity ;
+              rdfs:domain paml:ActivityNode ;
               rdfs:range xsd:anyURI ;
               rdfs:label "type" ;
               rdfs:comment "Type specification of a Value or Physical material" .
 
 
 # Flows (edges)
-paml:Flow rdf:type owl:Class ;
-              rdfs:comment "Flows are the edges of an activity graph" ;
-              rdfs:comment "A flow connects precisely one activity source to precisely one activity sink" ;
-              rdfs:subClassOf sbol:Identified ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:source ;
-                owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-                owl:onClass paml:Activity
-              ] ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:sink ;
-                owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-                owl:onClass paml:Activity
-              ] .
-
-paml:source rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf opil:compositionalProperty ;
-              rdfs:domain paml:Flow ;
-              rdfs:range paml:Activity ;
-              rdfs:label "source" ;
-              rdfs:comment "Activity from which a flow originates" .
-
-paml:sink rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf opil:compositionalProperty ;
-              rdfs:domain paml:Flow ;
-              rdfs:range paml:Activity ;
-              rdfs:label "sink" ;
-              rdfs:comment "Activity at which a flow arrives" .
-
-
-paml:ControlFlow rdf:type owl:Class ;
-        rdfs:subClassOf paml:Flow ;
-              rdfs:comment "Control flows indicate that the source activity must occur before the sink activity" .
-
-paml:InformationFlow rdf:type owl:Class ;
-        rdfs:subClassOf paml:Flow ;
-              rdfs:comment "Information flows indicate that information produced by an activity is used by another activity" .
-
-paml:PhysicalFlow rdf:type owl:Class ;
-        rdfs:subClassOf paml:Flow ;
-              rdfs:comment "Physical flows indicate that a material produced by an activity is used by another activity" .
 
 
 # Protocol
@@ -268,11 +394,11 @@ paml:Protocol rdf:type owl:Class ;
         rdfs:subClassOf sbol:TopLevel ,
         [ rdf:type owl:Restriction ;
                 owl:onProperty paml:hasActivity ;
-                owl:onClass paml:Activity
+                owl:onClass paml:ActivityNode
               ] ,
         [ rdf:type owl:Restriction ;
                 owl:onProperty paml:hasFlow ;
-                owl:onClass paml:Flow
+                owl:onClass paml:ActivityEdge
               ] ,
         [ rdf:type owl:Restriction ;
                 owl:onProperty paml:material ;
@@ -284,26 +410,26 @@ paml:Protocol rdf:type owl:Class ;
               ] ,
         [ rdf:type owl:Restriction ;
                 owl:onProperty paml:input ;
-                owl:onClass paml:Activity ;
+                owl:onClass paml:ActivityNode ;
               rdfs:comment "Designation of an activity as an input of a Protocol"
               ] ,
         [ rdf:type owl:Restriction ;
                 owl:onProperty paml:output ;
-                owl:onClass paml:Activity ;
+                owl:onClass paml:ActivityNode ;
               rdfs:comment "Designation of an activity as an output of a Protocol"
               ] .
 
 paml:hasActivity rdf:type owl:ObjectProperty ;
               rdfs:subPropertyOf opil:compositionalProperty ;
               rdfs:domain paml:Protocol ;
-              rdfs:range paml:Activity ;
+              rdfs:range paml:ActivityNode ;
               rdfs:label "hasActivity" ;
               rdfs:comment "Activity in a Protocol" .
 
 paml:hasFlow rdf:type owl:ObjectProperty ;
               rdfs:subPropertyOf opil:compositionalProperty ;
               rdfs:domain paml:Protocol ;
-              rdfs:range paml:Flow ;
+              rdfs:range paml:ActivityEdge ;
               rdfs:label "hasFlow" ;
               rdfs:comment "Flow in a Protocol" .
 
@@ -324,7 +450,7 @@ paml:hasContainer rdf:type owl:ObjectProperty ;
 paml:input rdf:type owl:ObjectProperty ;
               rdfs:subPropertyOf opil:compositionalProperty ;
               rdfs:domain paml:Protocol ;
-              rdfs:range paml:Activity ;
+              rdfs:range paml:ActivityNode ;
               rdfs:label "input" ;
               rdfs:comment "Designation of an activity as an input of a Protocol" .
 
