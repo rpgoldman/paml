@@ -11,24 +11,24 @@ spectrophotometer, the path length is fixed and is defined by the width of the c
 Therefore this conversion calculation can transform OD600 measurements from a plate reader (i.e. absorbance
 at 600 nm, the basic output of most instruments) into comparable OD600 measurements. The LUDOX solution
 is only weakly scattering and so will give a low absorbance value.
+        
 
 
-
- ## Materials
-* [LUDOX(R) CL-X colloidal silica, 45 wt. % suspension in H2O](https://identifiers.org/pubchem.substance:24866361)
+## Materials
 * [Water, sterile-filtered, BioReagent, suitable for cell culture](https://identifiers.org/pubchem.substance:24901740)
-* [Microplate](http://identifiers.org/NCIT:C43377)
+* [LUDOX(R) CL-X colloidal silica, 45 wt. % suspension in H2O](https://identifiers.org/pubchem.substance:24866361)
+* [Microplate](https://identifiers.org/ncit:C43377)
 
- ## Steps
-### Step 0
-Pipette <opil.opil_factory.LocalValuePin object at 0x10ecbaa90> of <opil.opil_factory.LocalValuePin object at 0x10e187c70> into <opil.opil_factory.LocalValuePin object at 0x10eae9c10>
-
+## Steps
 ### Step 1
-Pipette <opil.opil_factory.LocalValuePin object at 0x10eb62760> of <opil.opil_factory.LocalValuePin object at 0x10eaabc40> into <opil.opil_factory.LocalValuePin object at 0x10ec18ca0>
+Pipette 100.0 microliter of [LUDOX(R) CL-X colloidal silica, 45 wt. % suspension in H2O](https://identifiers.org/pubchem.substance:24866361) into [Microplate](https://identifiers.org/ncit:C43377) A1:D1
 
 ### Step 2
-Measure absorbance of <opil.opil_factory.LocalValuePin object at 0x10ec6fe50> at <opil.opil_factory.LocalValuePin object at 0x10ece03a0>
+Pipette 100.0 microliter of [Water, sterile-filtered, BioReagent, suitable for cell culture](https://identifiers.org/pubchem.substance:24901740) into [Microplate](https://identifiers.org/ncit:C43377) A2:D2
 
 ### Step 3
-Report values in [need to infer location information]
+Measure absorbance of [Microplate](https://identifiers.org/ncit:C43377) A2:D2 and [Microplate](https://identifiers.org/ncit:C43377) A1:D1 at 600.0 nanometre
+
+### Step 4
+Report values from [Microplate](https://identifiers.org/ncit:C43377) A2:D2 and [Microplate](https://identifiers.org/ncit:C43377) A1:D1
 
