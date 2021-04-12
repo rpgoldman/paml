@@ -314,69 +314,10 @@ paml:value rdf:type owl:ObjectProperty ;
     rdfs:label "value" ;
     rdfs:comment "Constant value to be supplied to the pin" .
 
-paml:PrimitiveExecutable rdf:type owl:Class ;
-              rdfs:comment "An executable that is a base-level library function, with its Pins determined by the specification of the function" ;
-        rdfs:subClassOf paml:Executable ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:instanceOf ;
-                owl:onClass paml:Primitive ;
-                owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-              ] .
-
-paml:instanceOf rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf opil:compositionalProperty ;
-              rdfs:domain paml:PrimitiveExecutable ;
-              rdfs:range paml:Primitive ;
-              rdfs:label "instanceOf" ;
-              rdfs:comment "Primitive to be executed" .
-
-paml:SubProtocol rdf:type owl:Class ;
-    rdfs:comment "An executable that is implemented as a Protocol, with its Pins determined by the input and output properties" ;
-    rdfs:subClassOf paml:Executable ,
-                    [ 
-                      rdf:type owl:Restriction ;
-                      owl:onProperty paml:implementedBy ;
-                      owl:onClass paml:Protocol ;
-                      owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                      owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-                    ]
+paml:InvocationAction rdf:type owl:Class ;
+    rdfs:comment "An action that invokes" ;
+    rdfs:subClassOf paml:Action
     .
-
-paml:implementedBy rdf:type owl:ObjectProperty ;
-    rdfs:subPropertyOf opil:compositionalProperty ;
-    rdfs:domain paml:SubProtocol ;
-    rdfs:range paml:Protocol ;
-    rdfs:label "implementedBy" ;
-    rdfs:comment "Protocol to be executed as a sub-protocol" .
-
-paml:InformationExecutable rdf:type owl:Class ;
-    rdfs:subClassOf paml:Executable ;
-              rdfs:comment "Abstract class; Executable activities that interact only with information flows (i.e., has no PhysicalPin)" .
-
-paml:PhysicalExecutable rdf:type owl:Class ;
-    rdfs:subClassOf paml:Executable ;
-    rdfs:comment "Abstract class; Executable activities that can interact with physical flows (i.e., has at least one PhysicalPin)" .
-
-
-paml:Value rdf:type owl:Class ;
-              rdfs:comment "Value activities are unilateral sources and sinks of information in the graph" ;
-        rdfs:subClassOf paml:ActivityNode ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:type ;
-                owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-              ] .
-
-paml:Physical rdf:type owl:Class ;
-              rdfs:comment "Physical activities are unilateral sources and sinks of physical materials in the graph" ;
-        rdfs:subClassOf paml:ActivityNode ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:type ;
-                owl:onClass sbol:Component ;
-                owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-              ] .
 
 paml:type rdf:type owl:ObjectProperty ;
               rdfs:domain paml:ActivityNode ;
