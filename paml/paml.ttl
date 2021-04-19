@@ -71,6 +71,7 @@ paml:Constraint rdf:type owl:Class ;
     rdfs:comment "Pre- and post-conditions" 
     .
 
+# TODO: parameters have default, direction, effect, and flags for whether are exception or stream
 paml:Parameter rdf:type owl:Class ;
     rdfs:comment "Parameter for acivity" 
     .
@@ -110,7 +111,7 @@ paml:ObjectNode rdf:type owl:Class ;
     rdfs:subClassOf paml:ActivityNode
     .
 
-# TODO: needs to be bound to a parameter of the activity
+# TODO: parameter must be bound to a parameter of the activity
 paml:ActivityParameterNode rdf:type owl:Class ;
     rdfs:comment "object node for parameter" ;
     rdfs:subClassOf paml:ObjectNode ,
@@ -326,135 +327,48 @@ paml:type rdf:type owl:ObjectProperty ;
               rdfs:comment "Type specification of a Value or Physical material" .
 
 
-# Flows (edges)
+
 
 
 # Protocol
+# TODO: protocol is an activity with a list of materials; exposes parameters of activity
 paml:Protocol rdf:type owl:Class ;
-              rdfs:comment "A protocol is an acyclic directed graph made of activities (nodes) and flows (edges). It must have precisely one Initial and one Final that are the unique top and bottom nodes of the graph" ; 
-        rdfs:subClassOf sbol:TopLevel ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:hasActivity ;
-                owl:onClass paml:ActivityNode
-              ] ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:hasFlow ;
-                owl:onClass paml:ActivityEdge
-              ] ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:material ;
-                owl:onClass sbol:Component
-              ] ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:hasLocation ;
-                owl:onClass paml:Location
-              ] ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:input ;
-                owl:onClass paml:ActivityNode ;
-              rdfs:comment "Designation of an activity as an input of a Protocol"
-              ] ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:output ;
-                owl:onClass paml:ActivityNode ;
-              rdfs:comment "Designation of an activity as an output of a Protocol"
-              ] .
+    rdfs:comment "A protocol consists of an activity and a list of materials" ; 
+    rdfs:subClassOf sbol:TopLevel ,
+                    [ 
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:activity ;
+                      owl:onClass paml:ActivityNode
+                    ] ,
+                    [ 
+                      rdf:type owl:Restriction ;
+                      owl:onProperty paml:materials ;
+                      owl:onClass sbol:Component
+                    ] 
+    .
 
-paml:hasActivity rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf opil:compositionalProperty ;
-              rdfs:domain paml:Protocol ;
-              rdfs:range paml:ActivityNode ;
-              rdfs:label "hasActivity" ;
-              rdfs:comment "Activity in a Protocol" .
+paml:activity rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf opil:compositionalProperty ;
+    rdfs:domain paml:Protocol ;
+    rdfs:range paml:ActivityNode ;
+    rdfs:label "activity" ;
+    rdfs:comment "Activity in a Protocol" 
+    .
 
-paml:hasFlow rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf opil:compositionalProperty ;
-              rdfs:domain paml:Protocol ;
-              rdfs:range paml:ActivityEdge ;
-              rdfs:label "hasFlow" ;
-              rdfs:comment "Flow in a Protocol" .
+paml:materials rdf:type owl:ObjectProperty ;
+    rdfs:domain paml:Protocol ;
+    rdfs:range sbol:Component ;
+    rdfs:label "material_list" ;
+    rdfs:comment "Specification for material used in a Protocol: all sbol:Component objects referred to by protocol" 
+    .
 
-paml:material rdf:type owl:ObjectProperty ;
-              rdfs:domain paml:Protocol ;
-              rdfs:range sbol:Component ;
-              rdfs:label "material" ;
-              rdfs:comment "Specification for material used in a Protocol: all sbol:Component objects referred to by protocol" .
-
-paml:hasLocation rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf opil:compositionalProperty ;
-              rdfs:domain paml:Protocol ;
-              rdfs:range paml:Location ;
-              rdfs:label "locations" ;
-              rdfs:comment "Any location referenced in a Protocol" .
-
-paml:inputActivity rdf:type owl:ObjectProperty ;
-              rdfs:domain paml:Protocol ;
-              rdfs:range paml:ActivityNode ;
-              rdfs:label "input" ;
-              rdfs:comment "Designation of an activity as an input of a Protocol" .
-
-paml:outputActivity rdf:type owl:ObjectProperty ;
-              rdfs:domain paml:Protocol ;
-              rdfs:range paml:Activity ;
-              rdfs:label "output" ; # better name in Python
-              rdfs:comment "Designation of an activity as an output of a Protocol" .
-
-paml:input rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf opil:compositionalProperty ;
-              rdfs:domain paml:Primitive ;
-              rdfs:range paml:PinSpecification ;
-              rdfs:domain paml:Executable ;
-              rdfs:range paml:Pin ;
-              rdfs:label "input" ;
-              rdfs:comment "Input of an Executable or Primitive" .
-
-paml:output rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf opil:compositionalProperty ;
-              rdfs:domain paml:Primitive ;
-              rdfs:range paml:PinSpecification ;
-              rdfs:domain paml:Executable ;
-              rdfs:range paml:Pin ;
-              rdfs:label "output" ;
-              rdfs:comment "Output of an Executable or Primitive" .
-
-paml:Primitive rdf:type owl:Class ;
-              rdfs:comment "An atomic protocol step, to be implemented by various platform-specific libraries" ;
-        rdfs:subClassOf sbol:TopLevel ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:input ;
-                owl:onClass paml:PinSpecification
-              ] ,
-        [ rdf:type owl:Restriction ;
-                owl:onProperty paml:output ;
-                owl:onClass paml:PinSpecification
-              ] .
-
-paml:PinSpecification rdf:type owl:Class ;
-              rdfs:comment "A ValuePin represents information as an input or output" ;
-            rdfs:subClassOf sbol:Identified ,
-                            [ rdf:type owl:Restriction ;
-                                owl:onProperty sbol:name ;
-                                owl:allValuesFrom xsd:string ;
-                              owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                              owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-                              ] ,
-                            [ rdf:type owl:Restriction ;
-                                owl:onProperty paml:activityType ;
-                                owl:allValuesFrom xsd:anyURI ;
-                              owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                              owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-                              ] ,
-                            [ rdf:type owl:Restriction ;
-                                owl:onProperty paml:optional ;
-                                owl:allValuesFrom xsd:boolean ;
-                              owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-                                rdfs:comment "Optional is not needed for output pins, which can always be ignored"
-                              ] .
-
-paml:optional rdf:type owl:DatatypeProperty ;
-              rdfs:domain paml:PinSpecification ;
-              rdfs:range xsd:boolean ;
-              rdfs:label "optional" .
+paml:location rdf:type owl:ObjectProperty ;
+    rdfs:subPropertyOf opil:compositionalProperty ;
+    rdfs:domain paml:Protocol ;
+    rdfs:range paml:Location ;
+    rdfs:label "locations" ;
+    rdfs:comment "Any location referenced in a Protocol" 
+    .
 
 paml:Location rdf:type owl:Class ;
               rdfs:comment "Locations are containers, wells, etc." ;
@@ -514,23 +428,7 @@ paml:ReplicateSamples rdf:type owl:Class ;
                               owl:minCardinality "1"^^xsd:nonNegativeInteger ;
                               ] .
 
-paml:HeterogeneousSamples rdf:type owl:Class ;
-              rdfs:comment "Collection of samples that may be of more than one type" ;
-            rdfs:subClassOf paml:LocatedSamples ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty paml:hasReplicateSamples ;
-                              owl:onClass paml:ReplicateSamples ;
-                              ] .
 
-paml:LocatedData rdf:type owl:Class ;
-              rdfs:comment "Collection of samples with data at locations" ;
-            rdfs:subClassOf paml:LocatedSamples ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty paml:hasExperimentalData ;
-                              owl:onClass sbol:ExperimentalData ;
-                              owl:minCardinality "1"^^xsd:nonNegativeInteger ;
-                              owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
-                              ] .
 
 paml:coordinates rdf:type owl:DatatypeProperty ;
               rdfs:domain paml:ContainerCoordinates ;
