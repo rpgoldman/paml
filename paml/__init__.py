@@ -144,8 +144,13 @@ Executable.output_pin = Executable_output_pin
 def make_PrimitiveExecutable(primitive: Primitive, **input_pin_map):
     self = PrimitiveExecutable(instance_of = primitive)
     self.make_pins(primitive, **input_pin_map)
+    executable_initialize_timepoints(self)
     return self
 
+def executable_initialize_timepoints(executable : Executable):
+    executable.start = TimeVariable()
+    executable.end = TimeVariable()
+    executable.duration = TimeVariable()
 
 def make_SubProtocol(protocol: Protocol, **input_pin_map):
     self = SubProtocol(instance_of = protocol)
@@ -181,7 +186,7 @@ Protocol.contains_activity = protocol_contains_activity
 def Protocol_initial(self):
     initial = [a for a in self.activities if isinstance(a, Initial)]
     if not initial:
-        self.activities.append(Initial())
+        self.activities.append(control_initialize_timepoints(Initial()))
         return Protocol_initial(self)
     elif len(initial)==1:
         return initial[0]
@@ -194,7 +199,7 @@ Protocol.initial = Protocol_initial
 def Protocol_final(self):
     final = [a for a in self.activities if isinstance(a, Final)]
     if not final:
-        self.activities.append(Final())
+        self.activities.append(control_initialize_timepoints(Final()))
         return Protocol_final(self)
     elif len(final)==1:
         return final[0]
@@ -281,6 +286,20 @@ def protocol_add_flow(self, source, sink):
     return flow
 # Monkey patch:
 Protocol.add_flow = protocol_add_flow
+
+def protocol_initialize_timepoints(self):
+    self.start = TimeVariable()
+    self.end = TimeVariable()
+    self.duration = TimeVariable()
+# Monkey patch:
+Protocol.initialize_timepoints = protocol_initialize_timepoints
+
+def control_initialize_timepoints(control : Control):
+    control.start = TimeVariable()
+    control.end = TimeVariable()
+    control.duration = TimeVariable()
+    return control
+
 
 #########################################
 # Library handling
