@@ -15,7 +15,8 @@ setup(name='paml',
             'graphviz',
             'tyto',
             'numpy',
-            'openpyxl'
+            'openpyxl',
+            'paml-check'
       ],
       packages=['paml', 'paml_md', 'paml.lib'],
       package_data={'paml': ['paml.ttl', 'lib/*.ttl'],
