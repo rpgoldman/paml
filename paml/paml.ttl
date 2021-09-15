@@ -147,11 +147,16 @@ paml:flow rdf:type owl:ObjectProperty ;
 paml:ActivityEdgeFlow rdf:type owl:Class ;
         rdfs:comment "Record of a token flowing through an ActivityEdge" ;
         rdfs:subClassOf sbol:Identified ,
-    [ rdf:type owl:Restriction ; owl:allValuesFrom uml:ActivityEdge ; owl:onProperty paml:edge ;
+    [ rdf:type owl:Restriction ; owl:allValuesFrom uml:ActivityEdge ; owl:onProperty paml:edge ; ],
+    [ rdf:type owl:Restriction ;
+        owl:onProperty paml:edge ;
       owl:minCardinality "0"^^xsd:nonNegativeInteger ; owl:maxCardinality "1"^^xsd:nonNegativeInteger ; ] ,
-    [ rdf:type owl:Restriction ; owl:allValuesFrom sbol:Identified ; owl:onProperty paml:edgeValue ;
+    [ rdf:type owl:Restriction ; owl:allValuesFrom sbol:Identified ; owl:onProperty paml:edgeValue ; ] ,
+    [ rdf:type owl:Restriction ; ; owl:onProperty paml:edgeValue ;
       owl:minCardinality "1"^^xsd:nonNegativeInteger ; owl:maxCardinality "1"^^xsd:nonNegativeInteger ; ] ,
-    [ rdf:type owl:Restriction ; owl:allValuesFrom paml:ActivityNodeExecution ; owl:onProperty paml:tokenSource ;
+    [ rdf:type owl:Restriction ; owl:onProperty paml:tokenSource ;
+    owl:allValuesFrom paml:ActivityNodeExecution ; ] ,
+    [ rdf:type owl:Restriction ; owl:onProperty paml:tokenSource ;
       owl:minCardinality "1"^^xsd:nonNegativeInteger ; owl:maxCardinality "1"^^xsd:nonNegativeInteger ; ] .
 
 paml:edge rdf:type owl:ObjectProperty ;
